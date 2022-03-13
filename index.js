@@ -2,7 +2,7 @@ const Alexa = require('ask-sdk-core');
 
 const https= require('https');
 
-
+const baseURL = 'https://disease.sh'
 
 const LaunchRequestHandler = {
   canHandle(handlerInput) {
@@ -12,11 +12,11 @@ const LaunchRequestHandler = {
   async handle(handlerInput) {
     let outputSpeech = 'This is the default message.';
 
-    await getRemoteData('https://corona.lmao.ninja/countries/France')
+    await getRemoteData(baseURL+'/v3/covid-19/countries/France')
       .then((response) => {
         const data = JSON.parse(response);
         
-        outputSpeech = `Il y a actuellement ${data.cases} cas en France. `;
+        outputSpeech = `Aujourd'hui, Il y a eu ${data.todayCases} cas en France. Au total, il y a eu ${data.cases} cas en France`;
         
       })
       .catch((err) => {
@@ -45,14 +45,14 @@ const HelloHandler = {
   
     console.log(country);
     let outputSpeech = 'This is the default message.';
-    await getRemoteData('https://corona.lmao.ninja/countries/'+country[0].english[0])
+    await getRemoteData(baseURL+'/v3/covid-19/countries/'+country[0].english[0])
       .then((response) => {
         const data = JSON.parse(response);
         if(data.error){
           outputSpeech='Il n\'y a pas de cas dans ce pays';
         }
         else{
-        outputSpeech = `Il y a actuellement ${data.cases} cas en `+ handlerInput.requestEnvelope.request.intent.slots.Pays.value;
+        outputSpeech = `Aujourd'hui, il y a eu ${data.todayCases} cas en `+ handlerInput.requestEnvelope.request.intent.slots.Pays.value+`, au total il y a eu ${data.cases} cas en `+ handlerInput.requestEnvelope.request.intent.slots.Pays.value;
         }
       })
       .catch((err) => {
